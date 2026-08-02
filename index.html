@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LexiPic</title>
+</head>
+
+<body>
+
+<h1>📚 LexiPic</h1>
+
+<h2>Apple</h2>
+
+<p>🍎</p>
+
+<button onclick="speak()">🔊 발음 듣기</button>
+
+<p>사과</p>
+
+<script>
+function speak(){
+ const voice = new SpeechSynthesisUtterance("Apple");
+ voice.lang = "en-US";
+ speechSynthesis.speak(voice);
+}
+</script>
+
+</body>
+</html>

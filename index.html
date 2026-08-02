@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>LexiPic</title>
+<title>LexiPic 🇫🇷</title>
 
 
 <style>
@@ -14,7 +14,7 @@
 body{
 
 font-family:Arial,sans-serif;
-background:#f1f5f9;
+background:#f8fafc;
 padding:20px;
 
 }
@@ -22,7 +22,7 @@ padding:20px;
 
 .container{
 
-max-width:520px;
+max-width:550px;
 margin:auto;
 
 }
@@ -31,7 +31,7 @@ margin:auto;
 h1{
 
 text-align:center;
-color:#2563eb;
+color:#1d4ed8;
 
 }
 
@@ -41,10 +41,11 @@ color:#2563eb;
 background:white;
 padding:20px;
 border-radius:20px;
-margin-bottom:20px;
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
+margin-bottom:20px;
 
 }
+
 
 
 input{
@@ -52,12 +53,13 @@ input{
 width:100%;
 padding:12px;
 margin-bottom:10px;
-box-sizing:border-box;
 border-radius:12px;
 border:1px solid #ddd;
+box-sizing:border-box;
 font-size:16px;
 
 }
+
 
 
 button{
@@ -72,6 +74,7 @@ cursor:pointer;
 }
 
 
+
 .card{
 
 background:white;
@@ -83,18 +86,32 @@ box-shadow:0 5px 15px rgba(0,0,0,0.08);
 }
 
 
-.image{
 
-height:150px;
-background:#e2e8f0;
+.photo{
+
+width:100%;
+height:180px;
 border-radius:15px;
+background:#e2e8f0;
 display:flex;
 align-items:center;
 justify-content:center;
 font-size:60px;
+overflow:hidden;
 margin-bottom:15px;
 
 }
+
+
+
+.photo img{
+
+width:100%;
+height:100%;
+object-fit:cover;
+
+}
+
 
 
 .word{
@@ -103,6 +120,7 @@ font-size:30px;
 font-weight:bold;
 
 }
+
 
 
 .meaning{
@@ -114,18 +132,36 @@ margin:10px 0;
 }
 
 
+
+.voice{
+
+background:#16a34a;
+margin-right:5px;
+
+}
+
+
+
+.native{
+
+background:#9333ea;
+
+}
+
+
+
 .delete{
 
 background:#ef4444;
-margin-left:10px;
+margin-left:5px;
 
 }
 
 
 </style>
 
-</head>
 
+</head>
 
 
 <body>
@@ -134,16 +170,19 @@ margin-left:10px;
 <div class="container">
 
 
-<h1>📚 LexiPic</h1>
-
+<h1>🇫🇷 LexiPic</h1>
 
 
 <div class="box">
 
 
-<input id="word" placeholder="단어 입력">
+<input id="word" placeholder="프랑스어 단어">
 
-<input id="meaning" placeholder="뜻 입력">
+<input id="meaning" placeholder="한국어 뜻">
+
+
+<input id="image" placeholder="이미지 주소 (선택)">
+
 
 
 <button onclick="addWord()">
@@ -154,7 +193,6 @@ margin-left:10px;
 
 
 </div>
-
 
 
 <div id="list"></div>
@@ -182,84 +220,9 @@ JSON.stringify(words)
 }
 
 
+// 🇫🇷 프랑스어 AI 발음
 
-
-// 언어 감지
-
-function detectLanguage(word){
-
-
-let french=[
-
-"bonjour",
-"merci",
-"salut",
-"amour",
-"france",
-"français",
-"oui",
-"non",
-"chat",
-"chien",
-"fromage",
-"maison",
-"école"
-
-];
-
-
-let w=word.toLowerCase();
-
-
-
-if(french.includes(w)){
-
-return "fr-FR";
-
-}
-
-
-
-if(
-w.includes("é") ||
-w.includes("è") ||
-w.includes("ê") ||
-w.includes("ç")
-){
-
-return "fr-FR";
-
-}
-
-
-return "en-US";
-
-
-}
-
-
-
-
-// 업그레이드 발음
-
-function speak(word){
-
-
-let lang =
-detectLanguage(word);
-
-
-
-let voices =
-speechSynthesis.getVoices();
-
-
-
-let voice =
-voices.find(v =>
-v.lang.includes(lang)
-);
-
+function speakAI(word){
 
 
 let speech =
@@ -267,19 +230,13 @@ new SpeechSynthesisUtterance(word);
 
 
 
-speech.lang=lang;
+speech.lang="fr-FR";
 
 
 
-if(voice){
+// 조금 천천히 (학습용)
 
-speech.voice=voice;
-
-}
-
-
-
-speech.rate=0.85;
+speech.rate=0.8;
 
 speech.pitch=1;
 
@@ -287,11 +244,29 @@ speech.pitch=1;
 
 speechSynthesis.cancel();
 
-
 speechSynthesis.speak(speech);
 
 
 }
+
+
+
+
+
+// 원어민 발음 버튼 (추후 Forvo 연결)
+
+function speakNative(){
+
+
+alert(
+"🗣 원어민 발음 기능은 다음 업데이트에서 연결됩니다!"
+);
+
+
+}
+
+
+
 
 
 function addWord(){
@@ -301,8 +276,15 @@ let word =
 document.getElementById("word").value.trim();
 
 
+
 let meaning =
 document.getElementById("meaning").value.trim();
+
+
+
+let image =
+document.getElementById("image").value.trim();
+
 
 
 
@@ -310,11 +292,14 @@ if(word==="") return;
 
 
 
+
 words.push({
 
 word:word,
 
-meaning:meaning || "뜻 없음"
+meaning:meaning || "뜻 없음",
+
+image:image || ""
 
 });
 
@@ -327,6 +312,9 @@ save();
 document.getElementById("word").value="";
 
 document.getElementById("meaning").value="";
+
+document.getElementById("image").value="";
+
 
 
 render();
@@ -343,7 +331,9 @@ function removeWord(index){
 words.splice(index,1);
 
 
+
 save();
+
 
 
 render();
@@ -370,6 +360,20 @@ list.innerHTML="";
 words.forEach((item,index)=>{
 
 
+let imageHTML="🖼️";
+
+
+
+if(item.image){
+
+imageHTML=
+`
+<img src="${item.image}">
+`;
+
+}
+
+
 
 list.innerHTML += `
 
@@ -377,9 +381,9 @@ list.innerHTML += `
 <div class="card">
 
 
-<div class="image">
+<div class="photo">
 
-🖼️
+${imageHTML}
 
 </div>
 
@@ -387,7 +391,7 @@ list.innerHTML += `
 
 <div class="word">
 
-${item.word}
+🇫🇷 ${item.word}
 
 </div>
 
@@ -400,17 +404,26 @@ ${item.meaning}
 </div>
 
 
+<button class="voice"
+onclick="speakAI('${item.word}')">
 
-
-<button onclick="speak('${item.word}')">
-
-🔊 발음
+🔊 AI 발음
 
 </button>
 
 
 
-<button class="delete" onclick="removeWord(${index})">
+<button class="native"
+onclick="speakNative()">
+
+🗣 원어민
+
+</button>
+
+
+
+<button class="delete"
+onclick="removeWord(${index})">
 
 삭제
 
@@ -424,21 +437,13 @@ ${item.meaning}
 `;
 
 
-
 });
 
 
 }
 
 
-
-speechSynthesis.onvoiceschanged = function(){
-
-speechSynthesis.getVoices();
-
-};
-
-
+// 저장된 단어 표시
 
 render();
 

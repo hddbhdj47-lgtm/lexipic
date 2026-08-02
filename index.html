@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-    max-width:500px;
+    max-width:520px;
     margin:auto;
 }
 
@@ -24,6 +24,7 @@ h1 {
     text-align:center;
     color:#2563eb;
 }
+
 
 .box {
     background:white;
@@ -41,16 +42,19 @@ input {
     border-radius:12px;
     border:1px solid #ddd;
     box-sizing:border-box;
+    font-size:16px;
 }
 
 
 button {
+
     background:#2563eb;
     color:white;
     border:none;
-    padding:12px;
+    padding:12px 16px;
     border-radius:12px;
     cursor:pointer;
+
 }
 
 
@@ -67,13 +71,13 @@ button {
 
 .image {
 
-    height:150px;
+    height:160px;
     background:#e2e8f0;
     border-radius:15px;
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:50px;
+    font-size:60px;
     margin-bottom:15px;
 
 }
@@ -81,26 +85,37 @@ button {
 
 .word {
 
-font-size:28px;
-font-weight:bold;
+    font-size:30px;
+    font-weight:bold;
 
 }
 
 
 .meaning {
 
-color:#64748b;
-margin:10px 0;
+    color:#64748b;
+    margin:10px 0;
+    font-size:18px;
+
+}
+
+
+.info {
+
+    font-size:13px;
+    color:#94a3b8;
+    margin-top:10px;
 
 }
 
 
 .delete {
 
-background:#ef4444;
-margin-left:10px;
+    background:#ef4444;
+    margin-left:10px;
 
 }
+
 
 </style>
 
@@ -112,26 +127,24 @@ margin-left:10px;
 
 <div class="container">
 
+
 <h1>📚 LexiPic</h1>
 
 
 <div class="box">
 
 
-<input id="word" placeholder="단어">
+<input id="word" placeholder="단어 입력">
 
-<input id="meaning" placeholder="뜻">
+<input id="meaning" placeholder="뜻 입력">
 
 
 <button onclick="addWord()">
-
 추가
-
 </button>
 
 
 </div>
-
 
 
 <div id="list"></div>
@@ -149,31 +162,72 @@ let words = JSON.parse(localStorage.getItem("words")) || [];
 
 function save(){
 
-localStorage.setItem("words",JSON.stringify(words));
+    localStorage.setItem(
+        "words",
+        JSON.stringify(words)
+    );
 
 }
 
 
+
+// 언어 자동 선택 발음
 
 function speak(word){
 
-let u = new SpeechSynthesisUtterance(word);
 
-u.lang="en-US";
+let lang="en-US";
 
-speechSynthesis.speak(u);
+
+// 프랑스어 감지
+
+let frenchWords=[
+"bonjour",
+"merci",
+"salut",
+"amour",
+"france",
+"oui",
+"non",
+"chat",
+"chien",
+"fromage"
+];
+
+
+if(
+frenchWords.includes(word.toLowerCase())
+){
+
+lang="fr-FR";
 
 }
 
+
+let speech =
+new SpeechSynthesisUtterance(word);
+
+
+speech.lang=lang;
+
+
+speechSynthesis.speak(speech);
+
+
+}
 
 
 
 function addWord(){
 
 
-let word=document.getElementById("word").value;
+let word =
+document.getElementById("word").value.trim();
 
-let meaning=document.getElementById("meaning").value;
+
+let meaning =
+document.getElementById("meaning").value.trim();
+
 
 
 if(word==="") return;
@@ -182,13 +236,16 @@ if(word==="") return;
 
 words.push({
 
-word,
-meaning
+word:word,
+
+meaning:meaning || "뜻 없음"
 
 });
 
 
+
 save();
+
 
 
 document.getElementById("word").value="";
@@ -200,12 +257,9 @@ render();
 
 
 }
+function removeWord(index){
 
-
-
-function removeWord(i){
-
-words.splice(i,1);
+words.splice(index,1);
 
 save();
 
@@ -223,7 +277,7 @@ let list=document.getElementById("list");
 list.innerHTML="";
 
 
-words.forEach((item,i)=>{
+words.forEach((item,index)=>{
 
 
 list.innerHTML += `
@@ -253,6 +307,7 @@ ${item.meaning}
 </div>
 
 
+
 <button onclick="speak('${item.word}')">
 
 🔊 발음
@@ -260,11 +315,19 @@ ${item.meaning}
 </button>
 
 
-<button class="delete" onclick="removeWord(${i})">
+
+<button class="delete" onclick="removeWord(${index})">
 
 삭제
 
 </button>
+
+
+<div class="info">
+
+LexiPic 단어장
+
+</div>
 
 
 </div>
@@ -277,6 +340,7 @@ ${item.meaning}
 
 
 }
+
 
 
 render();

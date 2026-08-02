@@ -8,42 +8,32 @@
 
 <title>LexiPic 🇫🇷</title>
 
-
 <style>
 
 body{
-
 font-family:Arial,sans-serif;
 background:#f8fafc;
+padding:15px;
 margin:0;
-padding:20px;
-
 }
 
 
 .container{
-
 max-width:600px;
 margin:auto;
-
 }
 
 
 h1{
-
 text-align:center;
-color:#1d4ed8;
-
+color:#2563eb;
 }
 
 
-
 .menu{
-
 display:flex;
 gap:10px;
 margin-bottom:20px;
-
 }
 
 
@@ -62,17 +52,12 @@ font-size:16px;
 
 
 .section{
-
 display:none;
-
 }
 
 
-
 .active{
-
 display:block;
-
 }
 
 
@@ -96,7 +81,6 @@ margin-bottom:12px;
 border-radius:12px;
 border:1px solid #ddd;
 box-sizing:border-box;
-font-size:16px;
 
 }
 
@@ -104,12 +88,12 @@ font-size:16px;
 
 .add{
 
+width:100%;
+padding:13px;
+border:none;
+border-radius:12px;
 background:#16a34a;
 color:white;
-border:none;
-padding:13px;
-width:100%;
-border-radius:12px;
 font-size:16px;
 
 }
@@ -118,10 +102,18 @@ font-size:16px;
 
 .card{
 
+display:flex;
+gap:15px;
+align-items:center;
+
 background:white;
-padding:20px;
+
+padding:15px;
+
 border-radius:20px;
-margin-bottom:20px;
+
+margin-bottom:15px;
+
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
 }
@@ -130,14 +122,12 @@ box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
 .image{
 
-height:200px;
+width:120px;
+height:120px;
 border-radius:15px;
 overflow:hidden;
 background:#e2e8f0;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:60px;
+flex-shrink:0;
 
 }
 
@@ -153,11 +143,18 @@ object-fit:cover;
 
 
 
+.info{
+
+flex:1;
+
+}
+
+
+
 .word{
 
-font-size:32px;
+font-size:28px;
 font-weight:bold;
-margin-top:15px;
 
 }
 
@@ -165,9 +162,16 @@ margin-top:15px;
 
 .meaning{
 
-font-size:20px;
 color:#64748b;
-margin:10px 0;
+margin:8px 0;
+
+}
+
+
+
+button{
+
+cursor:pointer;
 
 }
 
@@ -178,11 +182,10 @@ margin:10px 0;
 background:#16a34a;
 color:white;
 border:none;
-padding:12px;
-border-radius:12px;
+padding:10px;
+border-radius:10px;
 
 }
-
 
 
 .delete{
@@ -190,9 +193,37 @@ border-radius:12px;
 background:#ef4444;
 color:white;
 border:none;
+padding:10px;
+border-radius:10px;
+margin-left:5px;
+
+}
+
+
+
+@media(max-width:450px){
+
+.card{
+
 padding:12px;
-border-radius:12px;
-margin-left:10px;
+
+}
+
+
+.image{
+
+width:90px;
+height:90px;
+
+}
+
+
+.word{
+
+font-size:22px;
+
+}
+
 
 }
 
@@ -213,15 +244,9 @@ margin-left:10px;
 
 <div class="menu">
 
-<button onclick="showAdd()">
-📥 단어 추가
-</button>
+<button onclick="showAdd()">📥 추가</button>
 
-
-<button onclick="showStudy()">
-📚 암기하기
-</button>
-
+<button onclick="showStudy()">📚 암기</button>
 
 </div>
 
@@ -235,12 +260,13 @@ margin-left:10px;
 
 <input id="word" placeholder="프랑스어 단어">
 
+
 <input id="meaning" placeholder="한국어 뜻">
 
 
 <button class="add" onclick="addWord()">
 
-저장하기
+저장
 
 </button>
 
@@ -248,21 +274,7 @@ margin-left:10px;
 </div>
 
 
-</div>
-
-
-
-<div id="studySection" class="section">
-
-
-<div id="list"></div>
-
-
-</div>
-
-
-<script>
-
+</div>// 데이터 저장
 
 let words =
 JSON.parse(localStorage.getItem("words")) || [];
@@ -277,6 +289,106 @@ JSON.stringify(words)
 );
 
 }
+
+
+
+// 프랑스어 → 이미지 검색용 단어 변환
+
+function translateImageWord(word){
+
+
+let dictionary={
+
+"chat":"cat",
+
+"chien":"dog",
+
+"maison":"house",
+
+"soleil":"sun",
+
+"lune":"moon",
+
+"fleur":"flower",
+
+"arbre":"tree",
+
+"voiture":"car",
+
+"livre":"book",
+
+"café":"coffee",
+
+"fromage":"cheese",
+
+"pain":"bread",
+
+"oiseau":"bird",
+
+"poisson":"fish"
+
+};
+
+
+let lower=word.toLowerCase();
+
+
+return dictionary[lower] || word;
+
+
+}
+
+
+
+
+
+// 이미지 자동 생성
+
+function getImage(word){
+
+
+let keyword =
+translateImageWord(word);
+
+
+
+return `https://loremflickr.com/400/400/${keyword}`;
+
+
+}
+
+
+
+
+
+// 프랑스어 발음
+
+function speak(word){
+
+
+let speech =
+new SpeechSynthesisUtterance(word);
+
+
+
+speech.lang="fr-FR";
+
+
+speech.rate=0.8;
+
+
+speech.pitch=1;
+
+
+speechSynthesis.cancel();
+
+
+speechSynthesis.speak(speech);
+
+
+}
+
+
 
 
 
@@ -295,7 +407,9 @@ document
 
 
 
+
 function showStudy(){
+
 
 document
 .getElementById("studySection")
@@ -309,50 +423,9 @@ document
 
 render();
 
-}
-
-
-// 자동 이미지 생성
-
-function getImage(word){
-
-let keyword = encodeURIComponent(word);
-
-return `https://loremflickr.com/600/400/${keyword}`;
 
 }
 
-}
-
-
-
-
-
-// 프랑스어 AI 발음
-
-function speak(word){
-
-
-let speech =
-new SpeechSynthesisUtterance(word);
-
-
-
-speech.lang="fr-FR";
-
-speech.rate=0.8;
-
-speech.pitch=1;
-
-
-
-speechSynthesis.cancel();
-
-
-speechSynthesis.speak(speech);
-
-
-}
 
 
 
@@ -362,7 +435,6 @@ function addWord(){
 
 let word =
 document.getElementById("word").value.trim();
-
 
 
 let meaning =
@@ -387,17 +459,15 @@ meaning:meaning || "뜻 없음"
 save();
 
 
-
 document.getElementById("word").value="";
 
 document.getElementById("meaning").value="";
 
 
-alert("단어가 저장되었습니다 🇫🇷");
+alert("저장 완료 🇫🇷");
 
 
 }
-
 
 
 
@@ -426,12 +496,12 @@ let list =
 document.getElementById("list");
 
 
+
 list.innerHTML="";
 
 
 
 words.forEach((item,index)=>{
-
 
 
 let image =
@@ -442,17 +512,22 @@ getImage(item.word);
 list.innerHTML += `
 
 
-
 <div class="card">
 
 
 <div class="image">
 
-<img src="${image}" 
+
+<img src="${image}"
+
 onerror="this.parentElement.innerHTML='🖼️';">
+
 
 </div>
 
+
+
+<div class="info">
 
 
 <div class="word">
@@ -460,7 +535,6 @@ onerror="this.parentElement.innerHTML='🖼️';">
 🇫🇷 ${item.word}
 
 </div>
-
 
 
 <div class="meaning">
@@ -474,7 +548,7 @@ ${item.meaning}
 <button class="voice"
 onclick="speak('${item.word}')">
 
-🔊 발음
+🔊
 
 </button>
 
@@ -492,15 +566,27 @@ onclick="removeWord(${index})">
 </div>
 
 
-`;
+</div>
 
+
+`;
 
 
 });
 
 
 }
+<div id="studySection" class="section">
 
+
+<div id="list"></div>
+
+
+</div>
+
+
+
+<script>
 
 
 // 저장된 단어 불러오기

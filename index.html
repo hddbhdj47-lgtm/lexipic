@@ -17,18 +17,15 @@ padding:15px;
 margin:0;
 }
 
-
 .container{
 max-width:600px;
 margin:auto;
 }
 
-
 h1{
 text-align:center;
 color:#2563eb;
 }
-
 
 .menu{
 display:flex;
@@ -36,9 +33,7 @@ gap:10px;
 margin-bottom:20px;
 }
 
-
 .menu button{
-
 flex:1;
 padding:14px;
 border:none;
@@ -46,48 +41,34 @@ border-radius:15px;
 background:#2563eb;
 color:white;
 font-size:16px;
-
 }
-
-
 
 .section{
 display:none;
 }
 
-
 .active{
 display:block;
 }
 
-
-
 .box{
-
 background:white;
 padding:20px;
 border-radius:20px;
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
-
 }
 
-
-
 input{
-
 width:100%;
 padding:13px;
 margin-bottom:12px;
 border-radius:12px;
 border:1px solid #ddd;
 box-sizing:border-box;
-
+font-size:16px;
 }
 
-
-
 .add{
-
 width:100%;
 padding:13px;
 border:none;
@@ -95,138 +76,81 @@ border-radius:12px;
 background:#16a34a;
 color:white;
 font-size:16px;
-
 }
 
-
-
 .card{
-
 display:flex;
 gap:15px;
 align-items:center;
-
 background:white;
-
 padding:15px;
-
 border-radius:20px;
-
 margin-bottom:15px;
-
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
-
 }
 
-
-
 .image{
-
 width:120px;
 height:120px;
 border-radius:15px;
 overflow:hidden;
 background:#e2e8f0;
 flex-shrink:0;
-
 }
 
-
-
 .image img{
-
 width:100%;
 height:100%;
 object-fit:cover;
-
 }
-
-
 
 .info{
-
 flex:1;
-
 }
-
-
 
 .word{
-
 font-size:28px;
 font-weight:bold;
-
 }
-
-
 
 .meaning{
-
 color:#64748b;
 margin:8px 0;
-
 }
-
-
-
-button{
-
-cursor:pointer;
-
-}
-
-
 
 .voice{
-
 background:#16a34a;
 color:white;
 border:none;
 padding:10px;
 border-radius:10px;
-
 }
 
-
 .delete{
-
 background:#ef4444;
 color:white;
 border:none;
 padding:10px;
 border-radius:10px;
 margin-left:5px;
-
 }
-
-
 
 @media(max-width:450px){
 
 .card{
-
-padding:12px;
-
+padding:10px;
 }
-
 
 .image{
-
 width:90px;
 height:90px;
-
 }
-
 
 .word{
-
 font-size:22px;
-
 }
 
-
 }
-
 
 </style>
 
@@ -238,18 +162,20 @@ font-size:22px;
 
 <div class="container">
 
-
 <h1>🇫🇷 LexiPic</h1>
 
 
 <div class="menu">
 
-<button onclick="showAdd()">📥 추가</button>
+<button onclick="showAdd()">
+📥 추가
+</button>
 
-<button onclick="showStudy()">📚 암기</button>
+<button onclick="showStudy()">
+📚 암기
+</button>
 
 </div>
-
 
 
 <div id="addSection" class="section active">
@@ -257,9 +183,7 @@ font-size:22px;
 
 <div class="box">
 
-
 <input id="word" placeholder="프랑스어 단어">
-
 
 <input id="meaning" placeholder="한국어 뜻">
 
@@ -274,8 +198,19 @@ font-size:22px;
 </div>
 
 
-</div>// 데이터 저장
+</div>
 
+
+<div id="studySection" class="section">
+
+
+<div id="list"></div>
+
+
+</div>
+
+
+<script>
 let words =
 JSON.parse(localStorage.getItem("words")) || [];
 
@@ -292,105 +227,57 @@ JSON.stringify(words)
 
 
 
-// 프랑스어 → 이미지 검색용 단어 변환
+// 프랑스어 단어 → 이미지 검색용 변환
 
-function translateImageWord(word){
-
+function imageKeyword(word){
 
 let dictionary={
 
 "chat":"cat",
-
 "chien":"dog",
-
 "maison":"house",
-
 "soleil":"sun",
-
 "lune":"moon",
-
 "fleur":"flower",
-
 "arbre":"tree",
-
 "voiture":"car",
-
 "livre":"book",
-
+"cafe":"coffee",
 "café":"coffee",
-
 "fromage":"cheese",
-
 "pain":"bread",
-
 "oiseau":"bird",
-
 "poisson":"fish"
 
 };
 
 
-let lower=word.toLowerCase();
+let key=word.toLowerCase();
 
 
-return dictionary[lower] || word;
-
+return dictionary[key] || key;
 
 }
 
 
 
 
-
-// 이미지 자동 생성
+// 자동 이미지
 
 function getImage(word){
 
-
-let keyword =
-translateImageWord(word);
-
+let keyword=imageKeyword(word);
 
 
 return `https://loremflickr.com/400/400/${keyword}`;
 
-
 }
 
 
 
 
 
-// 프랑스어 발음
-
-function speak(word){
-
-
-let speech =
-new SpeechSynthesisUtterance(word);
-
-
-
-speech.lang="fr-FR";
-
-
-speech.rate=0.8;
-
-
-speech.pitch=1;
-
-
-speechSynthesis.cancel();
-
-
-speechSynthesis.speak(speech);
-
-
-}
-
-
-
-
+// 화면 전환
 
 function showAdd(){
 
@@ -407,9 +294,7 @@ document
 
 
 
-
 function showStudy(){
-
 
 document
 .getElementById("studySection")
@@ -423,26 +308,30 @@ document
 
 render();
 
-
 }
 
 
 
 
 
+// 단어 추가
+
 function addWord(){
 
-
-let word =
+let word=
 document.getElementById("word").value.trim();
 
 
-let meaning =
+let meaning=
 document.getElementById("meaning").value.trim();
 
 
 
-if(word==="") return;
+if(word===""){
+
+return;
+
+}
 
 
 
@@ -459,6 +348,7 @@ meaning:meaning || "뜻 없음"
 save();
 
 
+
 document.getElementById("word").value="";
 
 document.getElementById("meaning").value="";
@@ -466,35 +356,57 @@ document.getElementById("meaning").value="";
 
 alert("저장 완료 🇫🇷");
 
-
 }
 
 
 
+
+// 삭제
 
 function removeWord(index){
 
-
 words.splice(index,1);
-
 
 save();
 
-
 render();
-
 
 }
 
 
 
 
+// 프랑스어 발음
+
+function speak(word){
+
+let speech=
+new SpeechSynthesisUtterance(word);
+
+
+speech.lang="fr-FR";
+
+speech.rate=0.8;
+
+speech.pitch=1;
+
+
+speechSynthesis.cancel();
+
+speechSynthesis.speak(speech);
+
+}
+
+
+
+
+
+// 카드 표시
+
 function render(){
 
-
-let list =
+let list=
 document.getElementById("list");
-
 
 
 list.innerHTML="";
@@ -502,11 +414,6 @@ list.innerHTML="";
 
 
 words.forEach((item,index)=>{
-
-
-let image =
-getImage(item.word);
-
 
 
 list.innerHTML += `
@@ -517,11 +424,9 @@ list.innerHTML += `
 
 <div class="image">
 
+<img src="${getImage(item.word)}"
 
-<img src="${image}"
-
-onerror="this.parentElement.innerHTML='🖼️';">
-
+onerror="this.style.display='none'">
 
 </div>
 
@@ -546,15 +451,17 @@ ${item.meaning}
 
 
 <button class="voice"
+
 onclick="speak('${item.word}')">
 
-🔊
+🔊 발음
 
 </button>
 
 
 
 <button class="delete"
+
 onclick="removeWord(${index})">
 
 삭제
@@ -572,27 +479,17 @@ onclick="removeWord(${index})">
 `;
 
 
+
 });
 
 
 }
-<div id="studySection" class="section">
-
-
-<div id="list"></div>
-
-
-</div>
 
 
 
-<script>
-
-
-// 저장된 단어 불러오기
+// 처음 실행
 
 render();
-
 
 
 </script>

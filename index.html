@@ -1,159 +1,4 @@
-function addWord(){
-
-
-let word =
-document.getElementById("word").value.trim();
-
-
-let meaning =
-document.getElementById("meaning").value.trim();
-
-
-
-if(word==="") return;
-
-
-
-words.push({
-
-word:word,
-
-meaning:meaning || "뜻 없음"
-
-});
-
-
-
-save();
-
-
-
-document.getElementById("word").value="";
-
-document.getElementById("meaning").value="";
-
-
-render();
-
-
-}
-
-
-
-
-function removeWord(index){
-
-
-words.splice(index,1);
-
-
-save();
-
-
-render();
-
-
-}
-
-
-
-
-
-function render(){
-
-
-let list =
-document.getElementById("list");
-
-
-
-list.innerHTML="";
-
-
-
-words.forEach((item,index)=>{
-
-
-
-list.innerHTML += `
-
-
-<div class="card">
-
-
-<div class="image">
-
-🖼️
-
-</div>
-
-
-
-<div class="word">
-
-${item.word}
-
-</div>
-
-
-
-<div class="meaning">
-
-${item.meaning}
-
-</div>
-
-
-
-
-<button onclick="speak('${item.word}')">
-
-🔊 발음
-
-</button>
-
-
-
-<button class="delete" onclick="removeWord(${index})">
-
-삭제
-
-</button>
-
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-}
-
-
-
-speechSynthesis.onvoiceschanged = function(){
-
-speechSynthesis.getVoices();
-
-};
-
-
-
-render();
-
-
-
-</script>
-
-
-</body>
-
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -449,3 +294,159 @@ speechSynthesis.speak(speech);
 }
 
 
+function addWord(){
+
+
+let word =
+document.getElementById("word").value.trim();
+
+
+let meaning =
+document.getElementById("meaning").value.trim();
+
+
+
+if(word==="") return;
+
+
+
+words.push({
+
+word:word,
+
+meaning:meaning || "뜻 없음"
+
+});
+
+
+
+save();
+
+
+
+document.getElementById("word").value="";
+
+document.getElementById("meaning").value="";
+
+
+render();
+
+
+}
+
+
+
+
+function removeWord(index){
+
+
+words.splice(index,1);
+
+
+save();
+
+
+render();
+
+
+}
+
+
+
+
+
+function render(){
+
+
+let list =
+document.getElementById("list");
+
+
+
+list.innerHTML="";
+
+
+
+words.forEach((item,index)=>{
+
+
+
+list.innerHTML += `
+
+
+<div class="card">
+
+
+<div class="image">
+
+🖼️
+
+</div>
+
+
+
+<div class="word">
+
+${item.word}
+
+</div>
+
+
+
+<div class="meaning">
+
+${item.meaning}
+
+</div>
+
+
+
+
+<button onclick="speak('${item.word}')">
+
+🔊 발음
+
+</button>
+
+
+
+<button class="delete" onclick="removeWord(${index})">
+
+삭제
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+}
+
+
+
+speechSynthesis.onvoiceschanged = function(){
+
+speechSynthesis.getVoices();
+
+};
+
+
+
+render();
+
+
+
+</script>
+
+
+</body>
+
+</html>

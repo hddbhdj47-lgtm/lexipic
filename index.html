@@ -4,61 +4,105 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>LexiPic 2.0 🇫🇷</title>
+<title>LexiPic 2.5 🇫🇷</title>
+
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 
 <style>
 
+
 body{
+
 font-family:Arial,sans-serif;
+
 background:#f8fafc;
+
 margin:0;
+
 padding:15px;
+
 }
+
 
 .container{
+
 max-width:600px;
+
 margin:auto;
+
 }
 
+
 h1{
+
 text-align:center;
+
 color:#2563eb;
+
 }
+
 
 
 .menu{
+
 display:flex;
-gap:10px;
+
+gap:8px;
+
 margin-bottom:20px;
+
 }
 
+
 .menu button{
+
 flex:1;
-padding:14px;
+
+padding:13px;
+
 border:none;
+
 border-radius:15px;
+
 background:#2563eb;
+
 color:white;
+
+font-size:15px;
+
 }
+
 
 
 .section{
+
 display:none;
+
 }
 
+
 .active{
+
 display:block;
+
 }
 
 
 .card{
 
 background:white;
+
 padding:20px;
+
 border-radius:20px;
+
 margin-bottom:15px;
+
 box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
 }
@@ -67,13 +111,21 @@ box-shadow:0 5px 15px rgba(0,0,0,0.08);
 input{
 
 width:100%;
+
 padding:13px;
-margin-bottom:10px;
-border-radius:12px;
-border:1px solid #ddd;
+
 box-sizing:border-box;
 
+margin-bottom:10px;
+
+border-radius:12px;
+
+border:1px solid #ddd;
+
+font-size:16px;
+
 }
+
 
 
 button{
@@ -83,13 +135,19 @@ cursor:pointer;
 }
 
 
+
 .save{
 
 width:100%;
-background:#16a34a;
-color:white;
-border:none;
+
 padding:13px;
+
+background:#16a34a;
+
+color:white;
+
+border:none;
+
 border-radius:12px;
 
 }
@@ -98,15 +156,8 @@ border-radius:12px;
 
 .word{
 
-font-size:30px;
-font-weight:bold;
+font-size:28px;
 
-}
-
-
-.gender{
-
-margin-top:10px;
 font-weight:bold;
 
 }
@@ -114,29 +165,23 @@ font-weight:bold;
 
 .meaning{
 
-font-size:18px;
 color:#64748b;
 
-}
-
-
-.example{
-
-margin-top:15px;
-background:#f1f5f9;
-padding:15px;
-border-radius:12px;
+margin-top:10px;
 
 }
-
 
 
 .voice{
 
 background:#16a34a;
+
 color:white;
+
 border:none;
+
 padding:10px;
+
 border-radius:10px;
 
 }
@@ -159,28 +204,41 @@ border-radius:10px;
 
 <div class="menu">
 
+
 <button onclick="showAdd()">
+
 📥 추가
+
 </button>
 
 
 <button onclick="showStudy()">
+
 📚 암기
+
 </button>
+
+
+<button onclick="showOCR()">
+
+📷 사진
+
+</button>
+
 
 </div>
 
 
-<div id="add" class="section active">
+<div id="addSection" class="section active">
 
 
 <div class="card">
 
 
-<input id="word" placeholder="프랑스어 입력">
+<input id="word" placeholder="프랑스어 단어">
 
 
-<input id="meaning" placeholder="뜻 (자동 입력 가능)">
+<input id="meaning" placeholder="뜻">
 
 
 <button class="save" onclick="addWord()">
@@ -196,176 +254,138 @@ border-radius:10px;
 </div>
 
 
-<div id="study" class="section">
+<div id="studySection" class="section">
 
 
 <div id="list"></div>
 
 
 </div>
+<div id="ocrSection" class="section">
+
+
+<div class="card">
+
+
+<h2>📷 단어장 사진 인식</h2>
+
+
+<input 
+type="file"
+accept="image/*"
+onchange="readImage(event)"
+>
+
+
+<img id="preview"
+
+style="
+width:100%;
+border-radius:15px;
+margin-top:15px;
+display:none;
+">
+
+
+<h3>🔍 인식 결과</h3>
+
+
+<div id="ocrResult">
+
+사진을 넣어주세요.
+
+</div>
+
+
+
+<button class="save"
+
+onclick="saveOCRWords()">
+
+단어장에 추가
+
+</button>
+
+
+
+</div>
+
+
+</div>
 
 
 <script>
-// 저장 데이터
+
 
 let words =
-JSON.parse(localStorage.getItem("lexipic")) || [];
+
+JSON.parse(localStorage.getItem("lexipicWords"))
+
+|| [];
+
+
+
+let ocrWords=[];
+
 
 
 
 function save(){
 
+
 localStorage.setItem(
-"lexipic",
+
+"lexipicWords",
+
 JSON.stringify(words)
+
 );
 
-}
-
-
-
-// 프랑스어 자동 정보 데이터
-
-const dictionary = {
-
-
-"chat":{
-
-meaning:"고양이",
-gender:"♂ 남성명사",
-example:"J'aime mon chat."
-
-},
-
-
-"chien":{
-
-meaning:"강아지",
-gender:"♂ 남성명사",
-example:"Mon chien est gentil."
-
-},
-
-
-"maison":{
-
-meaning:"집",
-gender:"♀ 여성명사",
-example:"Ma maison est grande."
-
-},
-
-
-"voiture":{
-
-meaning:"자동차",
-gender:"♀ 여성명사",
-example:"J'ai une voiture."
-
-},
-
-
-"livre":{
-
-meaning:"책",
-gender:"♂ 남성명사",
-example:"Je lis un livre."
-
-},
-
-
-"fleur":{
-
-meaning:"꽃",
-gender:"♀ 여성명사",
-example:"Cette fleur est belle."
-
-},
-
-
-"soleil":{
-
-meaning:"태양",
-gender:"♂ 남성명사",
-example:"Le soleil brille."
-
-},
-
-
-"pain":{
-
-meaning:"빵",
-gender:"♂ 남성명사",
-example:"Je mange du pain."
-
-}
-
-
-};
-
-
-
-
-
-function getInfo(word){
-
-
-let key =
-word.toLowerCase();
-
-
-
-return dictionary[key] || {
-
-
-meaning:"뜻 입력 필요",
-
-gender:"성별 확인 필요",
-
-example:"예문 준비 필요"
-
-
-};
-
 
 }
 
 
 
 
+// 단어 추가
 
-// 화면 변경
-
-function showAdd(){
-
-
-document
-.getElementById("add")
-.classList.add("active");
+function addWord(){
 
 
-document
-.getElementById("study")
-.classList.remove("active");
+let word=
+
+document.getElementById("word").value.trim();
 
 
-}
+let meaning=
+
+document.getElementById("meaning").value.trim();
 
 
 
+if(!word)return;
 
 
-function showStudy(){
+
+words.push({
+
+word:word,
+
+meaning:meaning || "뜻 확인 필요"
+
+});
 
 
-document
-.getElementById("study")
-.classList.add("active");
+
+save();
 
 
-document
-.getElementById("add")
-.classList.remove("active");
+document.getElementById("word").value="";
+
+document.getElementById("meaning").value="";
+
+
+alert("저장 완료 🇫🇷");
 
 
 render();
@@ -377,42 +397,193 @@ render();
 
 
 
-// 단어 추가
 
-function addWord(){
-
-
-let word =
-document.getElementById("word").value.trim();
+function showAdd(){
 
 
-
-let customMeaning =
-document.getElementById("meaning").value.trim();
+hideAll();
 
 
+document
 
-if(word==="") return;
+.getElementById("addSection")
+
+.classList.add("active");
+
+
+}
 
 
 
-let info =
-getInfo(word);
 
+
+function showStudy(){
+
+
+hideAll();
+
+
+document
+
+.getElementById("studySection")
+
+.classList.add("active");
+
+
+render();
+
+
+}
+
+
+
+
+
+function showOCR(){
+
+
+hideAll();
+
+
+document
+
+.getElementById("ocrSection")
+
+.classList.add("active");
+
+
+}
+
+
+
+
+
+function hideAll(){
+
+
+document
+
+.querySelectorAll(".section")
+
+.forEach(section=>{
+
+
+section.classList.remove("active");
+
+
+});
+
+
+}
+
+
+
+
+
+// 사진 OCR
+
+async function readImage(event){
+
+
+let file =
+
+event.target.files[0];
+
+
+
+if(!file)return;
+
+
+
+let preview=
+
+document.getElementById("preview");
+
+
+
+preview.src=
+
+URL.createObjectURL(file);
+
+
+
+preview.style.display="block";
+
+
+
+document.getElementById("ocrResult").innerHTML=
+
+"🔍 프랑스어 분석 중...";
+
+
+
+
+let result = await Tesseract.recognize(
+
+file,
+
+"fra",
+
+{
+
+logger:function(m){
+
+console.log(m);
+
+}
+
+}
+
+);
+
+
+
+
+let text=
+
+result.data.text;
+
+
+
+ocrWords =
+
+text
+
+.split(/\s+/)
+
+.map(word=>word.replace(/[^a-zA-ZÀ-ÿ-]/g,""))
+
+.filter(word=>word.length>1);
+
+
+
+document.getElementById("ocrResult").innerHTML =
+
+
+ocrWords.join("<br>");
+
+
+
+}
+
+
+
+
+
+function saveOCRWords(){
+
+
+ocrWords.forEach(word=>{
 
 
 words.push({
 
 word:word,
 
-meaning:
-customMeaning || info.meaning,
+meaning:"뜻 확인 필요"
 
-gender:
-info.gender,
+});
 
-example:
-info.example
 
 });
 
@@ -422,13 +593,17 @@ save();
 
 
 
-document.getElementById("word").value="";
+alert(
 
-document.getElementById("meaning").value="";
+ocrWords.length+
+
+"개 단어 추가 완료 🇫🇷"
+
+);
 
 
 
-alert("저장 완료 🇫🇷");
+render();
 
 
 
@@ -437,13 +612,13 @@ alert("저장 완료 🇫🇷");
 
 
 
-// 프랑스어 발음
-
-function speak(text){
+function speak(word){
 
 
-let speech =
-new SpeechSynthesisUtterance(text);
+let speech=
+
+new SpeechSynthesisUtterance(word);
+
 
 
 speech.lang="fr-FR";
@@ -462,24 +637,23 @@ speechSynthesis.speak(speech);
 
 
 
-
-// 화면 출력
-
 function render(){
 
 
-let list =
+let list=
+
 document.getElementById("list");
+
 
 
 list.innerHTML="";
 
 
 
-words.forEach((item,index)=>{
+words.forEach(item=>{
 
 
-list.innerHTML += `
+list.innerHTML +=`
 
 
 <div class="card">
@@ -492,15 +666,6 @@ list.innerHTML += `
 </div>
 
 
-
-<div class="gender">
-
-${item.gender}
-
-</div>
-
-
-
 <div class="meaning">
 
 뜻 : ${item.meaning}
@@ -509,33 +674,11 @@ ${item.gender}
 
 
 
-<div class="example">
-
-📌 예문
-
-<br>
-
-${item.example}
-
-
-<br><br>
-
-
 <button class="voice"
-onclick="speak('${item.example}')">
 
-🔊 예문 듣기
-
-</button>
-
-
-</div>
-
-
-<button class="voice"
 onclick="speak('${item.word}')">
 
-🔊 단어 발음
+🔊 듣기
 
 </button>
 
@@ -547,13 +690,12 @@ onclick="speak('${item.word}')">
 `;
 
 
-
 });
 
 
 }
 
-// 저장된 단어 자동 표시
+// 처음 실행 시 저장된 단어 표시
 
 render();
 
@@ -562,5 +704,6 @@ render();
 
 
 </body>
+
 
 </html>

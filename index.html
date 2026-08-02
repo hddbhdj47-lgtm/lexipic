@@ -1,28 +1,244 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>LexiPic</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #2563eb;
+}
+
+.add-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+button {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.card {
+
+    background:white;
+    padding:20px;
+    margin-bottom:15px;
+    border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+.word {
+
+    font-size:28px;
+    font-weight:bold;
+
+}
+
+.meaning {
+
+    color:#64748b;
+    margin:10px 0;
+
+}
+
+.delete {
+
+    background:#ef4444;
+    margin-left:10px;
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
+
+<div class="container">
+
 <h1>📚 LexiPic</h1>
 
-<h2>Apple</h2>
 
-<p>🍎</p>
+<div class="add-box">
 
-<button onclick="speak()">🔊 발음 듣기</button>
+<input id="wordInput" placeholder="단어 입력">
 
-<p>사과</p>
+<button onclick="addWord()">
+추가
+</button>
+
+</div>
+
+
+<div id="list"></div>
+
+
+</div>
+
+
 
 <script>
-function speak(){
- const voice = new SpeechSynthesisUtterance("Apple");
- voice.lang = "en-US";
- speechSynthesis.speak(voice);
+
+
+let words = JSON.parse(localStorage.getItem("words")) || [];
+
+
+function save(){
+
+localStorage.setItem("words", JSON.stringify(words));
+
 }
+
+
+
+function speak(word){
+
+let speech = new SpeechSynthesisUtterance(word);
+
+speech.lang="en-US";
+
+speechSynthesis.speak(speech);
+
+}
+
+
+
+function addWord(){
+
+let input=document.getElementById("wordInput");
+
+let word=input.value.trim();
+
+
+if(word==="") return;
+
+
+words.push({
+
+word:word,
+meaning:"뜻 추가 예정"
+
+});
+
+
+save();
+
+input.value="";
+
+render();
+
+
+}
+
+
+
+function removeWord(index){
+
+words.splice(index,1);
+
+save();
+
+render();
+
+}
+
+
+
+function render(){
+
+
+let list=document.getElementById("list");
+
+list.innerHTML="";
+
+
+words.forEach((item,index)=>{
+
+
+list.innerHTML += `
+
+
+<div class="card">
+
+
+<div class="word">
+
+${item.word}
+
+</div>
+
+
+<div class="meaning">
+
+${item.meaning}
+
+</div>
+
+
+<button onclick="speak('${item.word}')">
+
+🔊 발음
+
+</button>
+
+
+<button class="delete" onclick="removeWord(${index})">
+
+삭제
+
+</button>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+}
+
+
+render();
+
+
 </script>
+
 
 </body>
 </html>

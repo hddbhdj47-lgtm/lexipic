@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
 
 <meta charset="UTF-8">
@@ -7,112 +8,116 @@
 
 <title>LexiPic</title>
 
+
 <style>
 
-body {
-    font-family: Arial, sans-serif;
-    background:#f1f5f9;
-    padding:20px;
-}
+body{
 
-.container {
-    max-width:520px;
-    margin:auto;
-}
-
-h1 {
-    text-align:center;
-    color:#2563eb;
-}
-
-
-.box {
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.08);
-    margin-bottom:20px;
-}
-
-
-input {
-    width:100%;
-    padding:12px;
-    margin-bottom:10px;
-    border-radius:12px;
-    border:1px solid #ddd;
-    box-sizing:border-box;
-    font-size:16px;
-}
-
-
-button {
-
-    background:#2563eb;
-    color:white;
-    border:none;
-    padding:12px 16px;
-    border-radius:12px;
-    cursor:pointer;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+padding:20px;
 
 }
 
 
-.card {
+.container{
 
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    margin-bottom:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+max-width:520px;
+margin:auto;
 
 }
 
 
-.image {
+h1{
 
-    height:160px;
-    background:#e2e8f0;
-    border-radius:15px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:60px;
-    margin-bottom:15px;
+text-align:center;
+color:#2563eb;
 
 }
 
 
-.word {
+.box{
 
-    font-size:30px;
-    font-weight:bold;
-
-}
-
-
-.meaning {
-
-    color:#64748b;
-    margin:10px 0;
-    font-size:18px;
+background:white;
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
 }
 
 
-.info {
+input{
 
-    font-size:13px;
-    color:#94a3b8;
-    margin-top:10px;
+width:100%;
+padding:12px;
+margin-bottom:10px;
+box-sizing:border-box;
+border-radius:12px;
+border:1px solid #ddd;
+font-size:16px;
 
 }
 
 
-.delete {
+button{
 
-    background:#ef4444;
-    margin-left:10px;
+background:#2563eb;
+color:white;
+border:none;
+padding:12px 16px;
+border-radius:12px;
+cursor:pointer;
+
+}
+
+
+.card{
+
+background:white;
+padding:20px;
+border-radius:20px;
+margin-bottom:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+.image{
+
+height:150px;
+background:#e2e8f0;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:60px;
+margin-bottom:15px;
+
+}
+
+
+.word{
+
+font-size:30px;
+font-weight:bold;
+
+}
+
+
+.meaning{
+
+font-size:18px;
+color:#64748b;
+margin:10px 0;
+
+}
+
+
+.delete{
+
+background:#ef4444;
+margin-left:10px;
 
 }
 
@@ -120,6 +125,7 @@ button {
 </style>
 
 </head>
+
 
 
 <body>
@@ -131,6 +137,7 @@ button {
 <h1>📚 LexiPic</h1>
 
 
+
 <div class="box">
 
 
@@ -140,11 +147,14 @@ button {
 
 
 <button onclick="addWord()">
+
 추가
+
 </button>
 
 
 </div>
+
 
 
 <div id="list"></div>
@@ -153,62 +163,129 @@ button {
 </div>
 
 
+
 <script>
 
 
-let words = JSON.parse(localStorage.getItem("words")) || [];
+let words =
+JSON.parse(localStorage.getItem("words")) || [];
 
 
 
 function save(){
 
-    localStorage.setItem(
-        "words",
-        JSON.stringify(words)
-    );
+localStorage.setItem(
+"words",
+JSON.stringify(words)
+);
 
 }
 
 
 
-// 언어 자동 선택 발음
 
-function speak(word){
+// 언어 감지
 
-
-let lang="en-US";
+function detectLanguage(word){
 
 
-// 프랑스어 감지
+let french=[
 
-let frenchWords=[
 "bonjour",
 "merci",
 "salut",
 "amour",
 "france",
+"français",
 "oui",
 "non",
 "chat",
 "chien",
-"fromage"
+"fromage",
+"maison",
+"école"
+
 ];
 
 
-if(
-frenchWords.includes(word.toLowerCase())
-){
+let w=word.toLowerCase();
 
-lang="fr-FR";
+
+
+if(french.includes(w)){
+
+return "fr-FR";
 
 }
+
+
+
+if(
+w.includes("é") ||
+w.includes("è") ||
+w.includes("ê") ||
+w.includes("ç")
+){
+
+return "fr-FR";
+
+}
+
+
+return "en-US";
+
+
+}
+
+
+
+
+// 업그레이드 발음
+
+function speak(word){
+
+
+let lang =
+detectLanguage(word);
+
+
+
+let voices =
+speechSynthesis.getVoices();
+
+
+
+let voice =
+voices.find(v =>
+v.lang.includes(lang)
+);
+
 
 
 let speech =
 new SpeechSynthesisUtterance(word);
 
 
+
 speech.lang=lang;
+
+
+
+if(voice){
+
+speech.voice=voice;
+
+}
+
+
+
+speech.rate=0.85;
+
+speech.pitch=1;
+
+
+
+speechSynthesis.cancel();
 
 
 speechSynthesis.speak(speech);
@@ -217,138 +294,3 @@ speechSynthesis.speak(speech);
 }
 
 
-
-function addWord(){
-
-
-let word =
-document.getElementById("word").value.trim();
-
-
-let meaning =
-document.getElementById("meaning").value.trim();
-
-
-
-if(word==="") return;
-
-
-
-words.push({
-
-word:word,
-
-meaning:meaning || "뜻 없음"
-
-});
-
-
-
-save();
-
-
-
-document.getElementById("word").value="";
-
-document.getElementById("meaning").value="";
-
-
-render();
-
-
-}
-function removeWord(index){
-
-words.splice(index,1);
-
-save();
-
-render();
-
-}
-
-
-
-function render(){
-
-
-let list=document.getElementById("list");
-
-list.innerHTML="";
-
-
-words.forEach((item,index)=>{
-
-
-list.innerHTML += `
-
-
-<div class="card">
-
-
-<div class="image">
-
-🖼️
-
-</div>
-
-
-<div class="word">
-
-${item.word}
-
-</div>
-
-
-<div class="meaning">
-
-${item.meaning}
-
-</div>
-
-
-
-<button onclick="speak('${item.word}')">
-
-🔊 발음
-
-</button>
-
-
-
-<button class="delete" onclick="removeWord(${index})">
-
-삭제
-
-</button>
-
-
-<div class="info">
-
-LexiPic 단어장
-
-</div>
-
-
-</div>
-
-
-`;
-
-
-});
-
-
-}
-
-
-
-render();
-
-
-</script>
-
-
-</body>
-
-</html>

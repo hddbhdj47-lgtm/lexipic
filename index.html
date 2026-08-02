@@ -316,13 +316,11 @@ render();
 
 function getImage(word){
 
-
 let keyword = encodeURIComponent(word);
 
+return `https://loremflickr.com/600/400/${keyword}`;
 
-
-return `https://source.unsplash.com/600x400/?${keyword}`;
-
+}
 
 }
 
